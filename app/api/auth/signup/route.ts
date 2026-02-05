@@ -12,9 +12,14 @@ const LoginSchema = z.object({
 // }
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    const data = LoginSchema.parse(await req.json())
+    try{
+        const data = LoginSchema.parse(await req.json())
     return NextResponse.json({data})
-}
+    } catch (error) {
+        return NextResponse.json({ error: 'Invalid input'}, {status: 400})
+    }
+} 
+
 
 
 // export function POST(){
