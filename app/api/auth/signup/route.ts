@@ -15,8 +15,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     try{
         const data = LoginSchema.parse(await req.json())
     return NextResponse.json({data})
-    } catch (error) {
-        return NextResponse.json({ error: 'Invalid input'}, {status: 400})
+    } catch (error: any) {
+        return NextResponse.json({ error: JSON.parse(error.message)}, {status: 400})
     }
 } 
 
