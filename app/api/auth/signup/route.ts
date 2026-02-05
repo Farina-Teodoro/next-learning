@@ -6,8 +6,6 @@ const LoginSchema = z.object({
     password: z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/)
 })
 
-type Login = z.infer<typeof LoginSchema>;
-
 // const data = {
 //     email: "teo@email.com",
 //     password: "Teodoro17"
