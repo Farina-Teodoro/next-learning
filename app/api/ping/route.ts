@@ -11,7 +11,7 @@ export async function GET() {
         }
     )
     await prisma.$connect()
-    const result = await prisma.$queryRaw<{message: string}[]>`SELECT 'Hello world!' as message`;
+    const result = await prisma.$queryRaw<{ message: string }[]>`SELECT 'Hello world!' as message`;
     return NextResponse.json({ message: result[0].message })
 }
 

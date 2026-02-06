@@ -1,5 +1,3 @@
-import { request } from "http";
-
 describe('GET api/ping', () => {
 
     it("succeeds with correct payload", async () => {

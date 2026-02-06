@@ -14,7 +14,14 @@ datasource db {
 }
 
 model User {
-  username  String  @id
-  password  String
+  email    String @id
+  password String
+
   @@map("users")
+}
+
+model Organization {
+  name String @id
+
+  @@map("organization")
 }

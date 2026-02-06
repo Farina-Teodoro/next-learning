@@ -27,7 +27,3 @@ export async function POST(req: NextRequest) {
 export function GET() {
     return NextResponse.json({teo: 1})
 }
-
-//export function POST() {
-//    return NextResponse.json({teo: 2})
-//}

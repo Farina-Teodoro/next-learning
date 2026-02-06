@@ -1,3 +1,5 @@
+import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { NextRequest, NextResponse } from "next/server";
 import * as z from "zod";
 
@@ -6,37 +8,22 @@ const LoginSchema = z.object({
     password: z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/)
 })
 
-// const data = {
-//     email: "teo@email.com",
-//     password: "Teodoro17"
-// }
-
 export async function POST(req: NextRequest, res: NextResponse) {
-    try{
+    const prisma = new PrismaClient({
+        adapter: new PrismaPg({
+            connectionString: process.env["DATABASE_URL"],
+        })
+    })
+    await prisma.$connect()
+
+    try {
         const data = LoginSchema.parse(await req.json())
-    return NextResponse.json({data})
+        const result = await prisma.user.create({ data })
+        return NextResponse.json({ data: result })
     } catch (error: any) {
-        return NextResponse.json({ error: JSON.parse(error.message)}, {status: 400})
+        if (error instanceof z.ZodError) {
+            return NextResponse.json({ error: JSON.parse(error.message) }, { status: 400 })
+        }
+        return NextResponse.json({ error: "user already exists" }, { status: 400 })
     }
-} 
-
-
-
-// export function POST(){
-//     const login: Login = LoginSchema.parse(data);
-//     return NextResponse.json({login})
-// }
-
-
-// const validationResult = LoginSchema.safeParse(data)
-// export function POST(){
-//     return NextResponse.json({validationResult})
-// }
-
-
-// async function createLogin(req: Request, res: Response): Promise<void> {
-//   const data: Login = LoginSchema.parse(req.body);
-//   const newLogin = await saveLogin(data);
-//   res.json(newLogin);
-// }
-
+}

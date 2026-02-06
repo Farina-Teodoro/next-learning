@@ -1,20 +1,23 @@
-import { request } from "http";
+import { Client } from "pg";
 
 describe('POST api/auth/signup', () => {
 
+    beforeAll( async () => {
+        const client = new Client({ connectionString: "postgres://postgres:postgres@localhost:5432/postgres" });
+        await client.connect()
+        await client.query('TRUNCATE TABLE users')
+        await client.end()
+    })
+
     it("succeeds with correct payload", async () => {
-        const url = 'http://localhost:3000/api/auth/signup/';
-        const options = {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: '{"email":"teo@email.com","password":"Teodoro17"}'
-        };
-
-        const response = await fetch(url, options);
-        const data = await response.json();
-
+        const response = await requestSignUp("teo@email.com", "Teodoro17")
         expect(response.status).toBe(200)
-        expect(data).toEqual({ data: { email: 'teo@email.com', password: 'Teodoro17' } })
+    })
+
+    it("fails (email is already registered)", async () => {
+        const response = await requestSignUp("teo@email.com", "Teodoro17")
+        expect(response.status).toBe(400)
+        expect(await response.json()).toEqual({ "error": "user already exists" })
     })
 
     it("fails with wrong email (without @)", async () => {
@@ -23,15 +26,7 @@ describe('POST api/auth/signup', () => {
     })
 
     it("fails with wrong email (without .)", async () => {
-        const url = 'http://localhost:3000/api/auth/signup/';
-        const options = {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: '{"email":"teo@emailcom","password":"Teodoro17"}'
-        };
-
-        const response = await fetch(url, options);
-
+        const response = await requestSignUp("teo@emailcom", "Teodoro17")
         expect(response.status).toBe(400)
     })
 
@@ -62,7 +57,7 @@ describe('POST api/auth/signup', () => {
             headers: { 'content-type': 'application/json' },
             body: `{"email":"${email}","password":"${password}"}`
         };
-        
+
         return await fetch(url, options);
     }
 
