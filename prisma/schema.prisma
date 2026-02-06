@@ -23,5 +23,5 @@ model User {
 model Organization {
   name String @id
 
-  @@map("organization")
+  @@map("organizations")
 }
