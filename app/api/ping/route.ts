@@ -1,13 +1,17 @@
+import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { NextResponse } from "next/server";
-import { Client } from 'pg'
-
-
 
 export async function GET() {
-    const client = new Client({connectionString:"postgres://postgres:postgres@localhost:5432/postgres"});
-    await client.connect()
-    const res = await client.query('SELECT $1::text as message', ['Hello world!'])
-    await client.end()
-    return NextResponse.json({ message: res.rows[0].message })
+    const prisma = new PrismaClient(
+        {
+            adapter: new PrismaPg({
+                connectionString: process.env["DATABASE_URL"],
+            })
+        }
+    )
+    await prisma.$connect()
+    const result = await prisma.$queryRaw<{message: string}[]>`SELECT 'Hello world!' as message`;
+    return NextResponse.json({ message: result[0].message })
 }
 
